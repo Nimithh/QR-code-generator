@@ -1,0 +1,13 @@
+build/
+dist/
+__pycache__/
+*.pyc
+*.spec
+*.pkg
+*.toc
+*.zip
+*.pyz
+*.html
+*.txt.bak
+settings.local.json
+.claude/
