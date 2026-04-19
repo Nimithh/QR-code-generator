@@ -1,9 +1,0 @@
-{
-  "permissions": {
-    "allow": [
-      "Bash(pip install *)",
-      "Bash(pyinstaller --onefile --windowed --name \"QR Code Genarator\" main.py)",
-      "Bash(streamlit run *)"
-    ]
-  }
-}
