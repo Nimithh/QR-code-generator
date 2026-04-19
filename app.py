@@ -1,6 +1,8 @@
 import streamlit as st
+import streamlit.components.v1 as components
 from PIL import Image
 import io
+import base64
 from qr_builder import build_qr
 
 st.set_page_config(page_title="QR Code Generator", page_icon="🔳", layout="centered")
@@ -55,10 +57,41 @@ if st.button("Generate QR", type="primary", use_container_width=True):
 
         buf = io.BytesIO()
         img_rgb.save(buf, format="PNG")
-        st.download_button(
-            label="⬇ Download PNG",
-            data=buf.getvalue(),
-            file_name="qrcode.png",
-            mime="image/png",
-            use_container_width=True,
-        )
+        b64 = base64.b64encode(buf.getvalue()).decode()
+
+        components.html(f"""
+            <style>
+                .btn {{
+                    width: 100%;
+                    padding: 12px;
+                    margin: 6px 0;
+                    border: none;
+                    border-radius: 8px;
+                    font-size: 15px;
+                    font-weight: 600;
+                    cursor: pointer;
+                    transition: opacity 0.2s;
+                }}
+                .btn:hover {{ opacity: 0.85; }}
+                .copy-btn {{ background: #4a90d9; color: white; }}
+                .dl-btn {{ background: #2ecc71; color: white; text-decoration: none; display: block; text-align: center; }}
+            </style>
+
+            <button class="btn copy-btn" onclick="copyQR()">📋 Copy Image</button>
+            <a class="btn dl-btn" href="data:image/png;base64,{b64}" download="qrcode.png">⬇ Download PNG</a>
+
+            <script>
+                async function copyQR() {{
+                    const b64 = "{b64}";
+                    const blob = await fetch("data:image/png;base64," + b64).then(r => r.blob());
+                    try {{
+                        await navigator.clipboard.write([new ClipboardItem({{"image/png": blob}})]);
+                        const btn = document.querySelector(".copy-btn");
+                        btn.textContent = "✅ Copied!";
+                        setTimeout(() => btn.textContent = "📋 Copy Image", 2000);
+                    }} catch (e) {{
+                        alert("Copy not supported on this browser. Use Download instead.");
+                    }}
+                }}
+            </script>
+        """, height=110)
